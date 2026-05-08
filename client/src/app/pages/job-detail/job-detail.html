@@ -1,0 +1,61 @@
+<section>
+  @if (loading) {
+    <div class="panel">Loading job...</div>
+  } @else if (job) {
+    <article class="panel detail-panel">
+      <a class="btn-link" routerLink="/jobs">Back to jobs</a>
+      <p class="eyebrow">{{ job.status }}</p>
+      <h1>{{ job.title }}</h1>
+      <div class="meta-row">
+        <span>{{ job.companyName }}</span>
+        <span>{{ job.location }}</span>
+        <span>{{ job.employmentType }}</span>
+      </div>
+
+      <p>{{ job.description }}</p>
+
+      <div class="pill-row">
+        @for (skill of job.skills; track skill) {
+          <span class="pill">{{ skill }}</span>
+        }
+      </div>
+    </article>
+
+    @if (error) {
+      <div class="alert error">{{ error }}</div>
+    }
+
+    @if (success) {
+      <div class="alert success">{{ success }}</div>
+    }
+
+    <section class="panel apply-panel">
+      <h2>Apply to this job</h2>
+
+      @if (canApply) {
+        <form class="form-grid" [formGroup]="applyForm" (ngSubmit)="apply()">
+          <div class="field">
+            <label for="resumeUrl">Resume URL</label>
+            <input id="resumeUrl" formControlName="resumeUrl" placeholder="https://..." />
+          </div>
+
+          <div class="field">
+            <label for="coverLetter">Cover letter</label>
+            <textarea id="coverLetter" formControlName="coverLetter" placeholder="Briefly explain why this role fits."></textarea>
+          </div>
+
+          <button class="btn-primary" type="submit" [disabled]="applying">
+            {{ applying ? 'Submitting...' : 'Submit application' }}
+          </button>
+        </form>
+      } @else if (!auth.currentUser()) {
+        <p>Login as a candidate to apply for this job.</p>
+        <a class="btn-primary" routerLink="/login">Login to apply</a>
+      } @else {
+        <p>Only candidate accounts can apply to jobs.</p>
+      }
+    </section>
+  } @else if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+</section>

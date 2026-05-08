@@ -1,0 +1,137 @@
+<section>
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Platform dashboard</h1>
+      <p>Review users, jobs, and applications across the portal.</p>
+    </div>
+    <button class="btn-secondary" type="button" (click)="loadAll()" [disabled]="loading">Refresh</button>
+  </div>
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+  <div class="grid-three stats-grid">
+    <div class="panel stat">
+      <span>Users</span>
+      <strong>{{ counts.users }}</strong>
+    </div>
+    <div class="panel stat">
+      <span>Open jobs</span>
+      <strong>{{ counts.openJobs }}</strong>
+    </div>
+    <div class="panel stat">
+      <span>Applications</span>
+      <strong>{{ counts.applications }}</strong>
+    </div>
+  </div>
+
+  <section class="panel dashboard-section">
+    <h2>Users</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user._id) {
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.role }}</td>
+              <td>{{ user.isActive ? 'Active' : 'Disabled' }}</td>
+              <td>
+                <button class="btn-secondary" type="button" (click)="toggleUser(user)">
+                  {{ user.isActive ? 'Disable' : 'Activate' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel dashboard-section">
+    <h2>Jobs</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Company</th>
+            <th>Employer</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (job of jobs; track job._id) {
+            <tr>
+              <td>{{ job.title }}</td>
+              <td>{{ job.companyName }}</td>
+              <td>{{ employerName(job) }}</td>
+              <td>{{ job.status }}</td>
+              <td>
+                <button class="btn-danger" type="button" (click)="deleteJob(job)">Delete</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5">No jobs yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel dashboard-section">
+    <h2>Applications</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Job</th>
+            <th>Employer</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (application of applications; track application._id) {
+            <tr>
+              <td>{{ application.candidate.name }}</td>
+              <td>{{ application.job.title }}</td>
+              <td>{{ application.employer.name }}</td>
+              <td>
+                <select [value]="application.status" (change)="updateApplicationStatus(application, $any($event.target).value)">
+                  <option value="submitted">Submitted</option>
+                  <option value="reviewing">Reviewing</option>
+                  <option value="shortlisted">Shortlisted</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="hired">Hired</option>
+                </select>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">No applications yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

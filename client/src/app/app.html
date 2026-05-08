@@ -1,0 +1,33 @@
+<header class="app-header">
+  <a class="brand" routerLink="/jobs">MEAN Job Portal</a>
+
+  <nav class="nav-links" aria-label="Primary navigation">
+    <a routerLink="/jobs" routerLinkActive="active">Jobs</a>
+
+    @if (auth.currentUser()?.role === 'candidate') {
+      <a routerLink="/candidate" routerLinkActive="active">Candidate</a>
+    }
+
+    @if (auth.currentUser()?.role === 'employer') {
+      <a routerLink="/employer" routerLinkActive="active">Employer</a>
+    }
+
+    @if (auth.currentUser()?.role === 'admin') {
+      <a routerLink="/admin" routerLinkActive="active">Admin</a>
+    }
+  </nav>
+
+  <div class="auth-actions">
+    @if (auth.currentUser(); as user) {
+      <span class="user-chip">{{ user.name }} - {{ user.role }}</span>
+      <button type="button" class="ghost-button" (click)="logout()">Logout</button>
+    } @else {
+      <a class="ghost-button" routerLink="/login">Login</a>
+      <a class="primary-button" routerLink="/register">Register</a>
+    }
+  </div>
+</header>
+
+<main class="app-main">
+  <router-outlet />
+</main>

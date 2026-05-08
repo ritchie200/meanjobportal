@@ -1,0 +1,86 @@
+<section>
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Open roles</p>
+      <h1>Job search</h1>
+      <p>Search open jobs by title, company, skill, location, or employment type.</p>
+    </div>
+  </div>
+
+  <form class="panel search-panel" [formGroup]="searchForm" (ngSubmit)="loadJobs(1)">
+    <div class="grid-three">
+      <div class="field">
+        <label for="search">Keyword</label>
+        <input id="search" formControlName="search" placeholder="Frontend, Node, analyst" />
+      </div>
+
+      <div class="field">
+        <label for="location">Location</label>
+        <input id="location" formControlName="location" placeholder="Mumbai, Pune, Remote" />
+      </div>
+
+      <div class="field">
+        <label for="employmentType">Type</label>
+        <select id="employmentType" formControlName="employmentType">
+          <option value="">Any type</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Contract">Contract</option>
+          <option value="Internship">Internship</option>
+          <option value="Remote">Remote</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button class="btn-primary" type="submit" [disabled]="loading">Search</button>
+      <button class="btn-secondary" type="button" (click)="reset()">Reset</button>
+    </div>
+  </form>
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  @if (loading) {
+    <div class="panel">Loading jobs...</div>
+  } @else {
+    <div class="list-stack job-list">
+      @for (job of jobs; track job._id) {
+        <article class="item-card job-card">
+          <div>
+            <h2>{{ job.title }}</h2>
+            <div class="meta-row">
+              <span>{{ job.companyName }}</span>
+              <span>{{ job.location }}</span>
+              <span>{{ job.employmentType }}</span>
+              <span>{{ salary(job) }}</span>
+            </div>
+          </div>
+
+          <p>{{ job.description }}</p>
+
+          <div class="pill-row">
+            @for (skill of job.skills; track skill) {
+              <span class="pill">{{ skill }}</span>
+            }
+          </div>
+
+          <a class="btn-secondary" [routerLink]="['/jobs', job._id]">View details</a>
+        </article>
+      } @empty {
+        <div class="panel">No jobs match the current search.</div>
+      }
+    </div>
+
+    <div class="pagination button-row">
+      <button class="btn-secondary" type="button" [disabled]="pagination.page <= 1" (click)="loadJobs(pagination.page - 1)">
+        Previous
+      </button>
+      <span>Page {{ pagination.page }} of {{ pagination.pages }} - {{ pagination.total }} jobs</span>
+      <button class="btn-secondary" type="button" [disabled]="pagination.page >= pagination.pages" (click)="loadJobs(pagination.page + 1)">
+        Next
+      </button>
+    </div>
+  }
+</section>

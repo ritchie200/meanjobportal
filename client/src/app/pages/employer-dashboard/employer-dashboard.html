@@ -1,0 +1,209 @@
+<section>
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Employer</p>
+      <h1>Company dashboard</h1>
+      <p>Maintain the company profile, publish jobs, and review incoming applications.</p>
+    </div>
+  </div>
+
+  @if (error) {
+    <div class="alert error">{{ error }}</div>
+  }
+
+  @if (success) {
+    <div class="alert success">{{ success }}</div>
+  }
+
+  <div class="grid-two">
+    <section class="panel">
+      <h2>Company profile</h2>
+      <form class="form-grid" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="field">
+          <label for="companyName">Company name</label>
+          <input id="companyName" formControlName="companyName" />
+          @if (profileForm.controls.companyName.touched && profileForm.controls.companyName.invalid) {
+            <span class="validation">Company name is required.</span>
+          }
+        </div>
+
+        <div class="grid-two">
+          <div class="field">
+            <label for="website">Website</label>
+            <input id="website" formControlName="website" placeholder="https://..." />
+          </div>
+
+          <div class="field">
+            <label for="industry">Industry</label>
+            <input id="industry" formControlName="industry" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="companyLocation">Location</label>
+          <input id="companyLocation" formControlName="location" />
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <textarea id="description" formControlName="description"></textarea>
+        </div>
+
+        <button class="btn-primary" type="submit" [disabled]="savingProfile">
+          {{ savingProfile ? 'Saving...' : 'Save company profile' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>{{ editingJobId ? 'Edit job' : 'Post a job' }}</h2>
+      <form class="form-grid" [formGroup]="jobForm" (ngSubmit)="saveJob()">
+        <div class="field">
+          <label for="title">Title</label>
+          <input id="title" formControlName="title" />
+          @if (jobForm.controls.title.touched && jobForm.controls.title.invalid) {
+            <span class="validation">Use at least 3 characters.</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="jobDescription">Description</label>
+          <textarea id="jobDescription" formControlName="description"></textarea>
+          @if (jobForm.controls.description.touched && jobForm.controls.description.invalid) {
+            <span class="validation">Use at least 20 characters.</span>
+          }
+        </div>
+
+        <div class="grid-two">
+          <div class="field">
+            <label for="jobCompanyName">Company</label>
+            <input id="jobCompanyName" formControlName="companyName" />
+          </div>
+
+          <div class="field">
+            <label for="jobLocation">Location</label>
+            <input id="jobLocation" formControlName="location" />
+          </div>
+        </div>
+
+        <div class="grid-two">
+          <div class="field">
+            <label for="employmentType">Employment type</label>
+            <select id="employmentType" formControlName="employmentType">
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Internship">Internship</option>
+              <option value="Remote">Remote</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="status">Status</label>
+            <select id="status" formControlName="status">
+              <option value="open">Open</option>
+              <option value="closed">Closed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-two">
+          <div class="field">
+            <label for="salaryMin">Salary min</label>
+            <input id="salaryMin" formControlName="salaryMin" type="number" min="0" />
+          </div>
+
+          <div class="field">
+            <label for="salaryMax">Salary max</label>
+            <input id="salaryMax" formControlName="salaryMax" type="number" min="0" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="skills">Skills</label>
+          <input id="skills" formControlName="skills" placeholder="Angular, Express, MongoDB" />
+        </div>
+
+        <div class="button-row">
+          <button class="btn-primary" type="submit" [disabled]="savingJob">
+            {{ savingJob ? 'Saving...' : editingJobId ? 'Update job' : 'Post job' }}
+          </button>
+          <button class="btn-secondary" type="button" (click)="resetJobForm()">Clear</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <section class="panel dashboard-section">
+    <h2>Posted jobs</h2>
+    @if (loading) {
+      <p>Loading jobs...</p>
+    } @else {
+      <div class="list-stack">
+        @for (job of jobs; track job._id) {
+          <article class="item-card">
+            <h3>{{ job.title }}</h3>
+            <div class="meta-row">
+              <span>{{ job.location }}</span>
+              <span>{{ job.employmentType }}</span>
+              <span>{{ job.status }}</span>
+            </div>
+            <div class="button-row">
+              <button class="btn-secondary" type="button" (click)="editJob(job)">Edit</button>
+              <button class="btn-danger" type="button" (click)="deleteJob(job)">Delete</button>
+            </div>
+          </article>
+        } @empty {
+          <p>No jobs posted yet.</p>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="panel dashboard-section">
+    <h2>Applications</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Job</th>
+            <th>Resume</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (application of applications; track application._id) {
+            <tr>
+              <td>
+                <strong>{{ application.candidate.name }}</strong><br />
+                {{ application.candidate.email }}
+              </td>
+              <td>{{ application.job.title }}</td>
+              <td>
+                @if (application.resumeUrl) {
+                  <a [href]="application.resumeUrl" target="_blank" rel="noreferrer">Resume</a>
+                } @else {
+                  Not provided
+                }
+              </td>
+              <td>
+                <select [value]="application.status" (change)="updateStatus(application, $any($event.target).value)">
+                  <option value="submitted">Submitted</option>
+                  <option value="reviewing">Reviewing</option>
+                  <option value="shortlisted">Shortlisted</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="hired">Hired</option>
+                </select>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">No applications yet.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
