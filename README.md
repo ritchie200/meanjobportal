@@ -273,3 +273,10 @@ Apply to a job as a candidate:
 - Login as an admin and confirm users, jobs, and applications are listed.
 - Disable and re-enable a user from the admin dashboard.
 - Delete a job from the admin dashboard and confirm its applications are removed.
+
+## Support
+
+If you find this project useful, please consider starring the repository.  
+It helps support the project and shows employers/other developers that the work is useful.
+
+You are free to fork the project for learning purposes. Please keep the license and attribution intact.
